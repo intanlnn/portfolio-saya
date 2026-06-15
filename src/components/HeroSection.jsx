@@ -1,3 +1,4 @@
+// HeroSection.jsx
 import { useEffect, useRef, useState } from 'react'
 import Lanyard from './Lanyard.jsx'
 
@@ -14,15 +15,40 @@ const FLOATING_ITEMS = [
   { label: 'Mobile App', type: 'achievement', x: '79%', y: '82%', size: 15, delay: 0.9 },
 ]
 
+// floating items khusus mobile — lebih sedikit, posisi lebih atas/bawah supaya tidak nabrak lanyard
+const FLOATING_ITEMS_MOBILE = [
+  { label: 'React', type: 'skill', x: '4%', y: '12%', size: 11, delay: 0 },
+  { label: 'UI/UX', type: 'skill', x: '55%', y: '10%', size: 11, delay: 0.4 },
+  { label: 'Laravel', type: 'skill', x: '4%', y: '22%', size: 11, delay: 0.8 },
+  { label: 'MySQL', type: 'project', x: '55%', y: '20%', size: 11, delay: 0.3 },
+  { label: 'Website', type: 'achievement', x: '4%', y: '88%', size: 11, delay: 0.5 },
+  { label: 'Mobile App', type: 'achievement', x: '50%', y: '88%', size: 11, delay: 0.9 },
+]
+
 const typeStyle = {
   skill: { color: '#a78bfa', border: 'rgba(139,92,246,0.4)', bg: 'rgba(139,92,246,0.08)' },
   project: { color: '#34d399', border: 'rgba(52,211,153,0.4)', bg: 'rgba(52,211,153,0.08)' },
   achievement: { color: '#fbbf24', border: 'rgba(251,191,36,0.4)', bg: 'rgba(251,191,36,0.08)' },
 }
 
+function useWindowSize() {
+  const [width, setWidth] = useState(window.innerWidth)
+  useEffect(() => {
+    const handler = () => setWidth(window.innerWidth)
+    window.addEventListener('resize', handler)
+    return () => window.removeEventListener('resize', handler)
+  }, [])
+  return width
+}
+
 export default function HeroSection({ onCardClick, photoSrc }) {
   const [visible, setVisible] = useState(false)
+  const width = useWindowSize()
+  const isMobile = width < 768
+
   useEffect(() => { setTimeout(() => setVisible(true), 300) }, [])
+
+  const items = isMobile ? FLOATING_ITEMS_MOBILE : FLOATING_ITEMS
 
   return (
     <section id="hero" style={{
@@ -31,7 +57,7 @@ export default function HeroSection({ onCardClick, photoSrc }) {
       overflow: 'hidden'
     }}>
       {/* Floating items */}
-      {FLOATING_ITEMS.map((item, i) => {
+      {items.map((item, i) => {
         const ts = typeStyle[item.type]
         return (
           <div key={i} style={{
@@ -45,13 +71,13 @@ export default function HeroSection({ onCardClick, photoSrc }) {
             pointerEvents: 'none'
           }}>
             <div style={{
-              padding: '5px 10px',
+              padding: isMobile ? '3px 8px' : '5px 10px',
               border: `1px solid ${ts.border}`,
               borderRadius: 20,
               background: ts.bg,
               backdropFilter: 'blur(8px)',
               color: ts.color,
-              fontSize: item.size,
+              fontSize: isMobile ? 10 : item.size,
               fontFamily: 'Space Mono, monospace',
               whiteSpace: 'nowrap',
               boxShadow: `0 0 15px ${ts.border}`,
@@ -67,7 +93,7 @@ export default function HeroSection({ onCardClick, photoSrc }) {
       <div style={{
         position: 'relative', zIndex: 10,
         width: '100%', height: '100%',
-        maxWidth: 600,
+        maxWidth: isMobile ? '100%' : 600,
       }}>
         <Lanyard onCardClick={onCardClick} photoSrc={photoSrc} />
       </div>
@@ -76,8 +102,6 @@ export default function HeroSection({ onCardClick, photoSrc }) {
         @keyframes float0 { 0%,100%{transform:translateY(0px) rotate(-1deg)} 50%{transform:translateY(-12px) rotate(1deg)} }
         @keyframes float1 { 0%,100%{transform:translateY(0px)} 50%{transform:translateY(-8px)} }
         @keyframes float2 { 0%,100%{transform:translateY(-4px)} 50%{transform:translateY(8px)} }
-        @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
-        @keyframes scrollDot { 0%{opacity:1;transform:translateY(0)} 100%{opacity:0;transform:translateY(12px)} }
       `}</style>
     </section>
   )

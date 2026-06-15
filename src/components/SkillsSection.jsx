@@ -1,3 +1,4 @@
+// SkillsSection.jsx
 import { useEffect, useRef, useState } from 'react'
 
 const SKILLS = [
@@ -9,7 +10,7 @@ const SKILLS = [
   { name: 'UI/UX Design', cat: 'Design' },
   { name: 'Figma', cat: 'Design' },
   { name: 'HTML/CSS', cat: 'Frontend' },
-  { name: 'React Native', cat: 'Frontend' },
+  { name: 'Node JS', cat: 'Frontend' },
   { name: 'Basis Data', cat: 'Backend' },
 ]
 
@@ -19,12 +20,24 @@ const CAT_COLORS = {
   Design: '#f59e0b',
 }
 
+function useWindowSize() {
+  const [width, setWidth] = useState(window.innerWidth)
+  useEffect(() => {
+    const handler = () => setWidth(window.innerWidth)
+    window.addEventListener('resize', handler)
+    return () => window.removeEventListener('resize', handler)
+  }, [])
+  return width
+}
+
 export default function SkillsSection() {
   const canvasRef = useRef(null)
   const [inView, setInView] = useState(false)
   const ref = useRef(null)
   const angleRef = useRef(0)
   const animRef = useRef(null)
+  const width = useWindowSize()
+  const isMobile = width < 768
 
   useEffect(() => {
     const obs = new IntersectionObserver(
@@ -36,6 +49,7 @@ export default function SkillsSection() {
   }, [])
 
   useEffect(() => {
+    if (isMobile) return // sembunyikan canvas di mobile
     const canvas = canvasRef.current
     if (!canvas) return
     const ctx = canvas.getContext('2d')
@@ -64,7 +78,6 @@ export default function SkillsSection() {
         const skill = SKILLS[i]
         const color = CAT_COLORS[skill.cat] || '#8b5cf6'
 
-        // Connection line
         ctx.beginPath()
         ctx.moveTo(x1, y)
         ctx.lineTo(x2, y)
@@ -72,7 +85,6 @@ export default function SkillsSection() {
         ctx.lineWidth = 1
         ctx.stroke()
 
-        // Strand 1
         const r1 = 5 + (z1 + 1) * 4
         const alpha1 = (z1 + 1) / 2 * 0.8 + 0.2
         ctx.beginPath()
@@ -86,7 +98,6 @@ export default function SkillsSection() {
           ctx.shadowBlur = 0
         }
 
-        // Label on front
         if (z1 > 0.5) {
           ctx.fillStyle = '#fff'
           ctx.font = `bold ${8 + z1 * 4}px sans-serif`
@@ -95,7 +106,6 @@ export default function SkillsSection() {
           ctx.fillText(skill.name, x1, y)
         }
 
-        // Strand 2
         const r2 = 5 + (z2 + 1) * 4
         const alpha2 = (z2 + 1) / 2 * 0.8 + 0.2
         ctx.beginPath()
@@ -104,7 +114,6 @@ export default function SkillsSection() {
         ctx.fill()
       }
 
-      // Backbone lines
       for (let i = 0; i < N - 1; i++) {
         const t0 = i / (N - 1), t1 = (i + 1) / (N - 1)
         const y0 = startY + t0 * helixH, y1 = startY + t1 * helixH
@@ -135,11 +144,13 @@ export default function SkillsSection() {
 
     draw()
     return () => cancelAnimationFrame(animRef.current)
-  }, [])
+  }, [isMobile])
 
   return (
     <section id="skills" ref={ref} style={{
-      minHeight: '100vh', padding: '100px 5%', position: 'relative', zIndex: 10,
+      minHeight: '100vh',
+      padding: isMobile ? '60px 4%' : '100px 5%',
+      position: 'relative', zIndex: 10,
       display: 'flex', flexDirection: 'column', alignItems: 'center'
     }}>
       {/* Header */}
@@ -148,16 +159,18 @@ export default function SkillsSection() {
         transform: inView ? 'translateY(0)' : 'translateY(30px)',
         transition: 'all 0.8s ease',
         textAlign: 'center',
-        marginBottom: 60
+        marginBottom: isMobile ? 36 : 60
       }}>
         <span style={{
-          fontFamily: 'Space Mono, monospace', fontSize: 11,
+          fontFamily: 'Space Mono, monospace',
+          fontSize: isMobile ? 10 : 11,
           letterSpacing: '0.3em', color: '#34d399'
         }}>
           DNA of Skills
         </span>
         <h2 style={{
-          fontSize: 'clamp(2rem,5vw,3.5rem)', fontWeight: 800, marginTop: 12,
+          fontSize: isMobile ? '1.8rem' : 'clamp(2rem,5vw,3.5rem)',
+          fontWeight: 800, marginTop: 12,
           background: 'linear-gradient(135deg,#fff,#86efac)',
           WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'
         }}>
@@ -166,48 +179,54 @@ export default function SkillsSection() {
       </div>
 
       <div style={{
-        display: 'flex', gap: 60, alignItems: 'center',
-        width: '100%', maxWidth: 900, flexWrap: 'wrap', justifyContent: 'center'
+        display: 'flex',
+        flexDirection: isMobile ? 'column' : 'row',
+        gap: isMobile ? 32 : 60,
+        alignItems: isMobile ? 'stretch' : 'center',
+        width: '100%',
+        maxWidth: 900,
       }}>
-        {/* DNA Canvas */}
-        <canvas
-          ref={canvasRef}
-          style={{ width: 200, height: 460, borderRadius: 16, flexShrink: 0 }}
-          width={200}
-          height={460}
-        />
+        {/* DNA Canvas — sembunyikan di mobile */}
+        {!isMobile && (
+          <canvas
+            ref={canvasRef}
+            style={{ width: 200, height: 460, borderRadius: 16, flexShrink: 0 }}
+            width={200}
+            height={460}
+          />
+        )}
 
         {/* Skills list */}
-        <div style={{ flex: 1, minWidth: 280 }}>
+        <div style={{ flex: 1 }}>
           {SKILLS.map((skill, i) => {
             const color = CAT_COLORS[skill.cat]
             return (
               <div key={skill.name} style={{
-                marginBottom: 18,
+                marginBottom: isMobile ? 14 : 18,
                 opacity: inView ? 1 : 0,
                 transform: inView ? 'translateX(0)' : 'translateX(30px)',
                 transition: `all 0.5s ease ${i * 0.05}s`
               }}>
-                {/* Label */}
                 <div style={{
                   display: 'flex', justifyContent: 'space-between', marginBottom: 6
                 }}>
-                  <span style={{ fontSize: 13, fontWeight: 600 }}>{skill.name}</span>
+                  <span style={{ fontSize: isMobile ? 12 : 13, fontWeight: 600 }}>
+                    {skill.name}
+                  </span>
                   <span style={{
-                    fontSize: 11, fontFamily: 'Space Mono, monospace', color
+                    fontSize: isMobile ? 10 : 11,
+                    fontFamily: 'Space Mono, monospace', color
                   }}>
                     {skill.cat}
                   </span>
                 </div>
 
-                {/* Bar — always full width */}
                 <div style={{
                   height: 4, background: 'rgba(255,255,255,0.06)',
                   borderRadius: 2, overflow: 'hidden'
                 }}>
                   <div style={{
-                    height: '100%',
-                    borderRadius: 2,
+                    height: '100%', borderRadius: 2,
                     width: inView ? '100%' : '0%',
                     background: `linear-gradient(90deg, ${color}, ${color}88)`,
                     boxShadow: `0 0 8px ${color}`,
@@ -219,7 +238,10 @@ export default function SkillsSection() {
           })}
 
           {/* Legend */}
-          <div style={{ display: 'flex', gap: 16, marginTop: 24, flexWrap: 'wrap' }}>
+          <div style={{
+            display: 'flex', gap: isMobile ? 12 : 16,
+            marginTop: isMobile ? 16 : 24, flexWrap: 'wrap'
+          }}>
             {Object.entries(CAT_COLORS).map(([cat, color]) => (
               <div key={cat} style={{
                 display: 'flex', alignItems: 'center', gap: 6,
