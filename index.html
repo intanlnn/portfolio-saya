@@ -2,20 +2,39 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <title>Identity Orbit — Portfolio</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <style>
       *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-      html { scroll-behavior: smooth; }
+
+      html {
+        scroll-behavior: smooth;
+        overflow-x: hidden;
+        max-width: 100vw;
+      }
+
       body {
         background: #000;
         color: #fff;
         font-family: 'Syne', sans-serif;
         overflow-x: hidden;
+        max-width: 100vw;
         cursor: none;
+        /* Mencegah font inflate otomatis di iOS/Android */
+        -webkit-text-size-adjust: 100%;
+        text-size-adjust: 100%;
+      }
+
+      #root {
+        overflow-x: hidden;
+        max-width: 100vw;
+        position: relative;
       }
 
       /* Mobile: kembalikan cursor normal, hindari tap highlight biru */
