@@ -280,7 +280,7 @@ export default function Lanyard({ onCardClick, photoSrc }) {
       const alpha = (Math.sin(now*0.003)*0.5+0.5)*0.65
       ctx.fillStyle=`rgba(167,139,250,${alpha})`
       ctx.font='10px "Space Mono",monospace'
-      ctx.fillText('click or scroll to explore', 0, CH/2-12)
+      ctx.fillText('click lanyard to explore', 0, CH/2-12)
 
       // Shimmer stripe on hover
       if (s.glow > 0.05) {
